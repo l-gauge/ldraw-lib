@@ -33,7 +33,11 @@ To use this library, copy the contents of the `ldraw` folder into the `Unofficia
 - Original [LPub](http://lpub.binarybricks.nl) publishing tool by Kevin Clague
 - [LPub3D](https://trevorsandy.github.io/lpub3d/) successor to LPub by Trevor Sandy
 - [Manual](https://sites.google.com/site/workingwithlpub/lpub-4) for Legacy LPub 4 tool (last version by Kevin Clague)
-  
+
+
+### See Also
+
+- Fx Bricks [9V/Metal Fx Track System](https://github.com/fx-bricks/fx-track-ldraw) repository for LDraw models of 9V/metal track elements
 
 ---
 <p><small>LEGO® is a trademark of the LEGO® Group of companies which does not sponsor, authorize or endorse this site.</small></p>
