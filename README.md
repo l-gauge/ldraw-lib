@@ -1,4 +1,4 @@
-<img src="./images/MELDraw.png" width="700"/>
+<img src="./images/SystemCatalog.png"/>
 
 # L-Gauge.org LDraw Part Libraries
 
