@@ -1,6 +1,6 @@
 <img src="./images/SystemCatalog.png"/>
 
-# L-Gauge.org Standard RC Track LDraw Part Library
+# L-Gauge.org Standard RC Track LDraw Parts Library
 
 This repository contains add-on parts for LDraw compatible software tools. <a href="http://www.ldraw.org/">LDraw</a> is an open standard for LEGO® CAD software tools for defining parts and models. 
 
