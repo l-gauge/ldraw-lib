@@ -31,15 +31,16 @@ from scipy import spatial
 from ldrawpy import *
 from cqkit import *
 
+
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 
 srcdir = os.path.normpath(scriptdir + os.path.sep + "../cad")
 outdir = os.path.normpath(scriptdir + os.path.sep + "../ldraw")
 subdir = os.path.normpath(scriptdir + os.path.sep + "../ldraw/s")
 
-MIN_RES = 0.05
+MIN_RES = 0.1
 CIRCLE_RES = 24
-CURVE_RES = 10
+CURVE_RES = 8
 
 files = [
     "R40",
@@ -70,18 +71,23 @@ def log_mesh(mesh, msg=None, edges=None):
 
 
 def fix_mesh(mesh):
-    mesh, __ = pymesh.remove_degenerated_triangles(mesh, 100)
-    log_mesh(mesh, "Remove degenerate faces")
+    mesh = pymesh.resolve_self_intersection(mesh)
+    mesh, __ = pymesh.remove_duplicated_faces(mesh)
+    log_mesh(mesh, "Remove duplicates")
     mesh, __ = pymesh.collapse_short_edges(mesh, MIN_RES, preserve_feature=True)
     log_mesh(mesh, "Collapse short edges")
+    mesh, __ = pymesh.remove_obtuse_triangles(mesh, 170, 100)
+    log_mesh(mesh, "Remote obtuse faces")
+    mesh, __ = pymesh.collapse_short_edges(mesh, MIN_RES, preserve_feature=True)
+    log_mesh(mesh, "Collapse short edges")
+    mesh, __ = pymesh.remove_degenerated_triangles(mesh, 100)
+    log_mesh(mesh, "Remove degenerate faces")
     mesh = pymesh.resolve_self_intersection(mesh)
     mesh, __ = pymesh.remove_duplicated_faces(mesh)
     log_mesh(mesh, "Remove self intersections")
     mesh = pymesh.compute_outer_hull(mesh)
     mesh, __ = pymesh.remove_duplicated_faces(mesh)
     log_mesh(mesh, "New hull, remove duplicates")
-    mesh, __ = pymesh.remove_obtuse_triangles(mesh, 179.5, 5)
-    log_mesh(mesh, "Remote obtuse faces")
     mesh, __ = pymesh.remove_isolated_vertices(mesh)
     log_mesh(mesh, "Remove isolated vertices")
     return mesh
@@ -137,12 +143,19 @@ for f in files:
         e1 = list(e[1])
         p0 = tuple(vertices[spatial.distance.cdist([e0], vertices).argmin()])
         p1 = tuple(vertices[spatial.distance.cdist([e1], vertices).argmin()])
-        p0 = p0 if abs(Vector(p0) - Vector(tuple(e0))) < 0.2 else e0
-        p1 = p1 if abs(Vector(p1) - Vector(tuple(e1))) < 0.2 else e1
-        epts.append((p0, p1))
+        match0 = abs(Vector(p0) - Vector(tuple(e0))) < 0.2
+        match1 = abs(Vector(p1) - Vector(tuple(e1))) < 0.2
+        if not (match0 and match1):
+            if not match0:
+                p0 = e0
+            if not match1:
+                p1 = e1
+        if not abs(Vector(tuple(p0)) - Vector(tuple(p1))) < 0.025:
+            epts.append((p0, p1))
 
     log_mesh(mesh, edges=epts)
     ldr_obj = mesh_to_ldr(mesh.faces, mv, LDR_DEF_COLOUR, epts, LDR_OPT_COLOUR)
+    print(len(ldr_obj))
     hs = ldr_header(fnout, prefix="RCTrack")
     f = open(fnout, "w")
     f.write(hs)
